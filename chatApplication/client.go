@@ -30,3 +30,4 @@ func (c *client) write(){
 		}
 	}
 }
+
