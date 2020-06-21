@@ -1,12 +1,16 @@
 package main
+import(
+	"trace.go"
+)
 type room struct {
     //forward is a channel that holds incoming messages
     //that should be forwarded to the other clients.
 	forward chan []byte
-	//join is a channel for clinets wishing to leave the room
+	//join is a channel for clients wishing to leave the room
 	leave chan *client
 	//clients holds all current clients in this room
 	clients map[*client]bool
+	tracer trace.Tracer
 }
 // newRoom makes a new room
 func newRoom() *room {
@@ -15,6 +19,7 @@ func newRoom() *room {
 		join:		make(chan *client),
 		leave:		make(chan *client),
 		clients:	make(map[*client]bool),
+		tracer: 	trace.Off(),
 	)
 }
 func (r *room) run() {
@@ -23,14 +28,17 @@ func (r *room) run() {
 		case client := <-r.join:
 			//joining
 			r.clients[client] = true
+			r.tracer.Tracer("New client joined")
 		case client := <-r.leave:
 			//leaving
 			delete(r.clients, client)
 			close(client.send)
 		case msg := <-r.forward:
+			r.tracer.Tracer("Message recieved: ", string(msg))
 			//forward message to all clients
 			for client := range r.clients {
 				client.send <- msg
+				r.tracer.Trace(" -- sent to client")
 			}
 		}
 	}
