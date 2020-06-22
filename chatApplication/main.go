@@ -83,7 +83,7 @@ func main() {
 				<body>
 					Let's chat!
 				</body>
-			</html>
+			</html>`
 		))
 	})
 	// start the web server
