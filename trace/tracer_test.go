@@ -17,3 +17,7 @@ func TestNew(t *testing.T) {
 	}
     t.Error("we haven't written our test yet")
 }
+func TestOff(t *testing.T) {
+	var silentTracer Tracer = Off()
+	silentTracer.Trace("something")
+}
