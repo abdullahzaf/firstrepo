@@ -3,6 +3,9 @@ import (
 	"log"
 	"net/http"
 	"flag"
+	"github.com/stretchr/gomniauth/providers/facebook"
+	"github.com/stretchr/gomniauth/providers/github"
+	"github.com/stretchr/gomniauth/providers/google"
 )
 // temp1 represent a single template
 type templateHandler struct {
@@ -20,13 +23,18 @@ t.temp1.Execute(w, r)
 func main() {
 
 	// root
-	http.Handle("/", &templateHandler{filename: "chat.html"})
+	http.Handle("/chat", &templateHandler{filename: "chat.html"})
+	http.Handle("/login", &templateHandler{filename: "login.html"})
+	http.HandleFunc("/auth/", loginHandler)
+	http.Handle("/room", r)
 	//start the web server
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		log.Fatal("ListenAndServe:", err)
 	}
 	r := newRoom()
-	http.Handle("/", &templateHandler{filename: "chat.html"})
+	http.Handle("/chat", MustAuth(&templateHandler{filename: "chat.html"}))
+	http.Handle("/login", &templateHandler{filename: "login.html"})
+	http.HandleFUnc("/auth/", loginHandler)
 	http.Handle("/room", r)
 	//get the room going
 	go r.run()
@@ -36,9 +44,21 @@ func main() {
 	}
 	var addr = flag.String("addr", ":8080", "The addr of the application.")
 	flag.Parse() //parse the flags
+	//setup gomniauth
+	gomniuath.SetSecurityKey("PUT YOUR AUTH KEY HERE")
+	gomniauth.WithProviders(
+		facebook.New("key", "secret",
+			"http://localhost:8080/auth/callback/facebook"),
+		github.New("key", "secret",
+			"http://localhost:8080/auth/callback/github"),
+		google.New("key", "secret",
+			"http://localhost:8080/auth/callback/google"),
+	)
 	r := newRoom()
 	r.tracer = trace.New(os.Stdout)
-	http.Handle("/", &templateHandler{filename: "chat.html"})
+	http.Handle("/chat", MustAuth(&templateHandler{filename: "chat.html"}))
+	http.Handle("/login", &templateHandler{filename: "login.html"})
+	http.HandleFUnc("/auth/", loginHandler)
 	http.Handle("/room", r)
 	//get the room going
 	go r.run()
