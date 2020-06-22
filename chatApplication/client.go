@@ -7,9 +7,9 @@ type client struct {
     //socket is the web socket for this client.
     socket *websocket.Conn
     //send is a channel on which messages are sent.
-    send chan []byte
+    send chan *message
     //room is the room this client is chatting in.
-    room *room
+    userData map[string]interface{}
 }
 func (c *client) read() {
 	defer c.socket.Close()
