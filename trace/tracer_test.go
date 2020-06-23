@@ -1,9 +1,10 @@
 package trace
 
 import (
-	"testing"
 	"bytes"
+	"testing"
 )
+
 func TestNew(t *testing.T) {
 	var buf bytes.Buffer
 	tracer := New(&buf)
@@ -15,7 +16,6 @@ func TestNew(t *testing.T) {
 			t.Errorf("Trace should not write '%s'.", buf.String())
 		}
 	}
-    t.Error("we haven't written our test yet")
 }
 func TestOff(t *testing.T) {
 	var silentTracer Tracer = Off()
