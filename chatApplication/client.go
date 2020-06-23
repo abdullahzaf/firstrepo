@@ -13,23 +13,20 @@ type client struct {
 }
 func (c *client) read() {
 	defer c.socket.Close()
-	for{
-		var msg *message
-		err := c.socket.ReadJSON(&msg)
+	for {
+		_, msg, err := c.socket.ReadMessage()
 		if err != nil {
 			return
 		}
-		msg.When = time.Now()
-		msg.Name = c.userData["name"].(string)
 		c.room.forward <- msg
 	}
 }
-func (c *client) write(){
+func (c *client) write() {
 	defer c.socket.Close()
 	for msg := range c.send {
-		err := c.socket.WriteJSON(msg)
+		err := c.socket.WriteMessage(websocket.TextMessage, msg)
 		if err != nil {
-			break
+			return
 		}
 	}
 }
