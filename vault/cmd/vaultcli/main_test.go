@@ -1,3 +1,9 @@
+package main
+
+import(
+    "testing"
+)
+
 func TestPop(t *testing.T) {
     args := []string{"one", "two", "three"}
     var s string
